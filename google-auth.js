@@ -7,20 +7,41 @@ const config = {
 }
 
 const oauth2Client = new google.auth.OAuth2(
-  config.GOOGLE_CLIENT_ID,
-  config.GOOGLE_CLIENT_SECRET,
-  config.GOOGLE_REDIRECT_URL
+    config.GOOGLE_CLIENT_ID,
+    config.GOOGLE_CLIENT_SECRET,
+    config.GOOGLE_REDIRECT_URL
 );
 
 // generate a url that asks permissions for Google+ and Google Calendar scopes
-const scopes = [ 'email', 'profile' ]
+// const scopes = [ 'email', 'profile' ]
 
 const url = oauth2Client.generateAuthUrl({
-  // 'online' (default) or 'offline' (gets refresh_token)
-  access_type: 'offline',
+    // 'online' (default) or 'offline' (gets refresh_token)
+    access_type: 'offline',
 
-  // If you only need one scope you can pass it as a string
-  scope: scopes
+    // If you only need one scope you can pass it as a string
+    scope: 'email profile'
 });
 
-module.exports = { url }
+const authenticate = async (args) => {
+    // console.log('authenticate args', args)
+    const { tokens } = await oauth2Client.getToken(args.code)
+    oauth2Client.credentials = tokens;
+
+    const plus = google.plus({
+        version: 'v1',
+        auth: oauth2Client
+    });
+
+    const res = await plus.people.get({ userId: 'me' });
+    red(res.data)
+    // console.log(`Hello ${res.data}!`);
+
+
+    return 'blah'
+
+
+
+}
+
+module.exports = { url, authenticate }
