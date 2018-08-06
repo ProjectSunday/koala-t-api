@@ -1,9 +1,14 @@
 const { google } = require('googleapis');
 
+const jwt = require('jsonwebtoken')
+
+const DB = require('./db.js');
+
 const config = {
     GOOGLE_CLIENT_ID: '191304805062-up3pgt0b7j308dl3185fv34405sn145p.apps.googleusercontent.com',
     GOOGLE_CLIENT_SECRET: 'QQaKra7zz_WpOlgSgDD1OXfI',
     GOOGLE_REDIRECT_URL: 'http://localhost:8080/authcallback',
+    APP_SECRET: 'koala super secret',
 }
 
 const oauth2Client = new google.auth.OAuth2(
@@ -34,14 +39,19 @@ const authenticate = async (args) => {
     });
 
     const res = await plus.people.get({ userId: 'me' });
-    red(res.data)
-    // console.log(`Hello ${res.data}!`);
 
+    const googleId = res.data.id;
 
-    return 'blah'
+    let user = await DB.Read('Users', { googleId })
 
-
-
+    if (!user) {
+        const email = res.data.emails[0].value;
+        const { givenName, familyName } = res.data.name;
+        const imageUrl = res.data.image.url;
+        user = await DB.Create('Users', { googleId, email, givenName, familyName, imageUrl })
+    }
+    const jwtToken = jwt.sign({ userId: user._id }, config.APP_SECRET)
+    return { ...user, jwtToken }
 }
 
 module.exports = { url, authenticate }
