@@ -1,13 +1,13 @@
 var express = require('express')
 var graphqlHTTP = require('express-graphql')
-
+const cors = require('cors')
 require('./debug.js')
 
 const authMiddleware = require('./auth-middleware.js')
 const DB = require('./db.js')
 const schema = require('./schema.js')
 
-const { url, authenticate } = require('./google-auth.s')
+const { url, authenticate } = require('./google-auth.js')
 
 var root = {
     hello: () => 'Hello world!',
@@ -20,6 +20,7 @@ var root = {
 }
 
 var app = express()
+app.use(cors())
 app.use(authMiddleware)
 app.use('/graphql', graphqlHTTP({
     schema,
