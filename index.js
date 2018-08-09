@@ -1,60 +1,34 @@
-var express = require('express');
-var graphqlHTTP = require('express-graphql');
-var { buildSchema } = require('graphql');
-const authMiddleware = require('./auth-middleware.js');
+var express = require('express')
+var graphqlHTTP = require('express-graphql')
 
-require('./db.js')
 require('./debug.js')
 
-const { url, authenticate } = require('./google-auth');
+const authMiddleware = require('./auth-middleware.js')
+const DB = require('./db.js')
+const schema = require('./schema.js')
 
-var schema = buildSchema(`
-    type Query {
-        hello: String
-        getGoogleAuthUrl: String
-        leaderboard: [ Rank ]
-    }
-    type Mutation {
-        authenticate (code: String): User
-    }
-    type User {
-        _id: String
-        googleId: String
-        email: String
-        givenName: String
-        familyName: String
-        imageUrl: String
-        jwtToken: String
-    }
-    type Rank {
-        givenName: String
-        familyName: String
-        points: Int
-    }
-`);
-
+const { url, authenticate } = require('./google-auth.s')
 
 var root = {
     hello: () => 'Hello world!',
     authenticate,
     getGoogleAuthUrl: () => url,
-    leaderboard: () => {
-        return [
-            { givenName: 'blah', familyName: 'blah', points: 333 },
-            { givenName: 'blah', familyName: 'blah', points: 333 },
-            { givenName: 'blah', familyName: 'blah', points: 333 },
-            { givenName: 'blah', familyName: 'blah', points: 333 },
-            { givenName: 'blah', familyName: 'blah', points: 333 },
-            { givenName: 'blah', familyName: 'blah', points: 333 },
-        ]
+    leaderboard: async () => {
+        const users = await DB.readMany('Users', {}, { sort: { points: -1 }})
+        return users.map(({ givenName, familyName, points }) => ({ givenName, familyName, points }))
     }
-};
+}
 
-var app = express();
-app.use(authMiddleware);
+var app = express()
+app.use(authMiddleware)
 app.use('/graphql', graphqlHTTP({
-    schema: schema,
+    schema,
     rootValue: root,
     graphiql: true,
-}));
-app.listen(3000, () => console.log('API Server running on localhost:3000/graphql'));
+}))
+
+async function start() {
+    await DB.init()
+    app.listen(3000, () => console.log('API Server running on localhost:3000/graphql'))
+}
+start()

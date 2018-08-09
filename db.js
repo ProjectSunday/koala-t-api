@@ -5,34 +5,36 @@ const DATABASE_URL = process.env.DATABASE_URL || 'mongodb://127.0.0.1:27017/'
 
 
 
-// var _db
-
-// const connect = async () => {
-// 	try {
-// 		const _ = await MongoClient.connect(PADAWAN_MONGO_CONNECTION_STRING)
-// 		_db = _.db('padawan')
-// 	    console.log('=====> Connected to mongo server:', PADAWAN_MONGO_CONNECTION_STRING);
-// 	} catch (err) {
-// 	    console.error('Unable to connect to mongo server.')
-// 	}
-// }s
-
 let _db;
 
-MongoClient.connect(DATABASE_URL + DATABASE_NAME, { useNewUrlParser: true },function (err, database) {
-	if (err) {
+const init = async () => {
+	try {
+		const client = await MongoClient.connect(DATABASE_URL + DATABASE_NAME, { useNewUrlParser: true })
+		_db = client.db(DATABASE_NAME)
+		console.log('Mongo server connected:', DATABASE_URL + DATABASE_NAME)
+	} catch (err) {
 		console.error('Unable to connect to mongo server.', err)
-	} else {
-		_db = database.db(DATABASE_NAME)
-		console.log('Mongo server connected:', DATABASE_URL + DATABASE_NAME);
 	}
-})
+}
 
+
+// MongoClient.connect(DATABASE_URL + DATABASE_NAME, { useNewUrlParser: true },function (err, database) {
+// 	if (err) {
+// 		console.error('Unable to connect to mongo server.', err)
+// 	} else {
+// 		_db = database.db(DATABASE_NAME)
+// 		console.log('Mongo server connected:', DATABASE_URL + DATABASE_NAME);
+// 	}
+// })
 
 const Create = async (collection, value) => {
 	var r = await _db.collection(collection).insertOne(value)
 	var i = await _db.collection(collection).find({ _id: r.insertedId }).toArray()
 	return i[0]
+}
+
+const createMany = async (collection, docs) => {
+	await _db.collection(collection).insertMany(docs)
 }
 
 
@@ -41,8 +43,8 @@ const Read = async (collection, filter) => {
 	return r[0]
 }
 
-const ReadMany = async (collection, filter) => {
-	return await _db.collection(collection).find(filter).toArray()
+const readMany = async (collection, query, options) => {
+	return await _db.collection(collection).find(query, options).toArray()
 }
 
 
@@ -83,5 +85,5 @@ const DeleteMany = async (collection, filter) => {
 	}
 }
 
-module.exports = { Create, Delete, DeleteMany, Read, ReadMany, Update }
+module.exports = {init, Create, createMany, Delete, DeleteMany, Read, readMany, Update }
 

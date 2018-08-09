@@ -31,24 +31,24 @@ const url = oauth2Client.generateAuthUrl({
 const authenticate = async (args) => {
     // console.log('authenticate args', args)
     const { tokens } = await oauth2Client.getToken(args.code)
-    oauth2Client.credentials = tokens;
+    oauth2Client.credentials = tokens
 
     const plus = google.plus({
         version: 'v1',
         auth: oauth2Client
-    });
+    })
 
-    const res = await plus.people.get({ userId: 'me' });
+    const res = await plus.people.get({ userId: 'me' })
 
-    const googleId = res.data.id;
+    const googleId = res.data.id
 
     let user = await DB.Read('Users', { googleId })
 
     if (!user) {
-        const email = res.data.emails[0].value;
-        const { givenName, familyName } = res.data.name;
-        const imageUrl = res.data.image.url;
-        user = await DB.Create('Users', { googleId, email, givenName, familyName, imageUrl })
+        const email = res.data.emails[0].value
+        const { givenName, familyName } = res.data.name
+        const imageUrl = res.data.image.url
+        user = await DB.Create('Users', { googleId, email, givenName, familyName, imageUrl, points: 0 })
     }
     const jwtToken = jwt.sign({ userId: user._id }, config.APP_SECRET)
     return { ...user, jwtToken }
