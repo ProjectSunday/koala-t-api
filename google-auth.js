@@ -48,7 +48,7 @@ const authenticate = async (args) => {
         const email = res.data.emails[0].value
         const { givenName, familyName } = res.data.name
         const imageUrl = res.data.image.url
-        user = await DB.Create('Users', { googleId, email, givenName, familyName, imageUrl, points: 0 })
+        user = await DB.Create('Users', { googleId, email, givenName, familyName, imageUrl, points: 0, role: 'user' })
     }
     const jwtToken = jwt.sign({ userId: user._id }, config.APP_SECRET)
     return { ...user, jwtToken }

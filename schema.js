@@ -17,6 +17,7 @@ module.exports = buildSchema(`
         familyName: String
         imageUrl: String
         jwtToken: String
+        role: String
         points: Int
     }
     type Rank {
