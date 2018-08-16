@@ -3,6 +3,8 @@ var graphqlHTTP = require('express-graphql')
 const cors = require('cors')
 require('./debug.js')
 
+const PORT = process.env.PORT || 3001
+
 const authMiddleware = require('./auth-middleware.js')
 const DB = require('./db.js')
 const schema = require('./schema.js')
@@ -30,6 +32,6 @@ app.use('/graphql', graphqlHTTP({
 
 async function start() {
     await DB.init()
-    app.listen(3000, () => console.log('API Server running on localhost:3000/graphql'))
+    app.listen(PORT, () => console.log(`API Server running on localhost:${PORT}/graphql`))
 }
 start()
