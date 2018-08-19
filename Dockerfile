@@ -4,4 +4,4 @@ COPY . /api/
 
 WORKDIR /api/
 
-CMD [ "node", "index.js"]
+CMD [ "npm", "run", "deploy"]

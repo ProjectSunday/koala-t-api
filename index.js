@@ -3,7 +3,7 @@ var graphqlHTTP = require('express-graphql')
 const cors = require('cors')
 require('./debug.js')
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 9001
 
 const authMiddleware = require('./auth-middleware.js')
 const DB = require('./db.js')
