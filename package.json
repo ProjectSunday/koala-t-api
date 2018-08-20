@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "mongod --dbpath data/local | node index.js",
-    "seed_users": "node data/seed-users.js",
+    "seed_users": "node seed_users.js",
     "deploy": "npm install && node index.js"
   },
   "keywords": [],
