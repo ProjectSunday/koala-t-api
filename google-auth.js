@@ -20,7 +20,7 @@ const oauth2Client = new google.auth.OAuth2(
 // generate a url that asks permissions for Google+ and Google Calendar scopes
 // const scopes = [ 'email', 'profile' ]
 
-const url = oauth2Client.generateAuthUrl({
+const getGoogleAuthUrl = () => oauth2Client.generateAuthUrl({
     // 'online' (default) or 'offline' (gets refresh_token)
     access_type: 'offline',
 
@@ -42,7 +42,7 @@ const authenticate = async (args) => {
 
     const googleId = res.data.id
 
-    let user = await DB.Read('Users', { googleId })
+    let user = await DB.read('Users', { googleId })
 
     if (!user) {
         const email = res.data.emails[0].value
@@ -54,4 +54,4 @@ const authenticate = async (args) => {
     return { ...user, jwtToken }
 }
 
-module.exports = { url, authenticate }
+module.exports = { authenticate, getGoogleAuthUrl }

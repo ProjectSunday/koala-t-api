@@ -1,6 +1,7 @@
-var express = require('express')
-var graphqlHTTP = require('express-graphql')
+const express = require('express')
+const graphqlHTTP = require('express-graphql')
 const cors = require('cors')
+
 require('./debug.js')
 
 const PORT = process.env.PORT || 9001
@@ -8,20 +9,9 @@ const PORT = process.env.PORT || 9001
 const authMiddleware = require('./auth-middleware.js')
 const DB = require('./db.js')
 const schema = require('./schema.js')
+const root = require('./root-resolver.js')
 
-const { url, authenticate } = require('./google-auth.js')
-
-var root = {
-    hello: () => 'Hello world!',
-    authenticate,
-    getGoogleAuthUrl: () => url,
-    leaderboard: async () => {
-        const users = await DB.readMany('Users', {}, { sort: { points: -1 }})
-        return users.map(({ givenName, familyName, points }) => ({ givenName, familyName, points }))
-    }
-}
-
-var app = express()
+const app = express()
 app.use(cors())
 app.use(authMiddleware)
 app.use('/graphql', graphqlHTTP({

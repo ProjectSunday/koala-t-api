@@ -27,7 +27,7 @@ const init = async () => {
 // 	}
 // })
 
-const Create = async (collection, value) => {
+const create = async (collection, value) => {
 	var r = await _db.collection(collection).insertOne(value)
 	var i = await _db.collection(collection).find({ _id: r.insertedId }).toArray()
 	return i[0]
@@ -38,7 +38,7 @@ const createMany = async (collection, docs) => {
 }
 
 
-const Read = async (collection, filter) => {
+const read = async (collection, filter) => {
 	var r = await _db.collection(collection).find(filter).toArray()
 	return r[0]
 }
@@ -85,5 +85,5 @@ const DeleteMany = async (collection, filter) => {
 	}
 }
 
-module.exports = {init, Create, createMany, Delete, DeleteMany, Read, readMany, Update }
+module.exports = {init, create, createMany, Delete, DeleteMany, read, readMany, Update }
 

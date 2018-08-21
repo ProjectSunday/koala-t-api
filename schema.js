@@ -5,9 +5,16 @@ module.exports = buildSchema(`
         hello: String
         getGoogleAuthUrl: String
         leaderboard: [ Rank ]
+        signIn (email: String!, password: String!) : User
     }
     type Mutation {
         authenticate (code: String): User
+        signUp(
+            email: String!,
+            password: String!,
+            givenName: String!,
+            familyName: String!
+        ) : User
     }
     type User {
         _id: String
