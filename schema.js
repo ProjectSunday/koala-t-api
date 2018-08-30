@@ -15,6 +15,15 @@ module.exports = buildSchema(`
             givenName: String!,
             familyName: String!
         ) : User
+        promoteUser (_id: String, email: String) : GenericResult
+    }
+    type GenericResult {
+        success: Boolean
+        error: Error
+    }
+    type Error {
+        code: String
+        message: String
     }
     type User {
         _id: String
@@ -32,4 +41,5 @@ module.exports = buildSchema(`
         familyName: String
         points: Int
     }
+
 `);

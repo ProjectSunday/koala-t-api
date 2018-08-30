@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 9001
 
 const authMiddleware = require('./auth-middleware.js')
 const DB = require('./db.js')
+const appInit = require('./app-init.js')
 const schema = require('./schema.js')
 const root = require('./root-resolver.js')
 
@@ -22,6 +23,7 @@ app.use('/graphql', graphqlHTTP({
 
 async function start() {
     await DB.init()
+    await appInit()
     app.listen(PORT, () => console.log(`API Server running on localhost:${PORT}/graphql`))
 }
 start()

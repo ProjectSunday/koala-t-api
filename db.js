@@ -27,6 +27,15 @@ const init = async () => {
 // 	}
 // })
 
+const createOrUpdate = async (collection, filter, value) => {
+	var r = await _db.collection(collection).find(filter).toArray()
+	if (r.length) {
+		return await update(collection, { _id: r[0]._id }, value)
+	} else {
+		return await create(collection, value)
+	}
+}
+
 const create = async (collection, value) => {
 	var r = await _db.collection(collection).insertOne(value)
 	var i = await _db.collection(collection).find({ _id: r.insertedId }).toArray()
@@ -48,7 +57,7 @@ const readMany = async (collection, query, options) => {
 }
 
 
-const Update = async (collection, filter, value) => {
+const update = async (collection, filter, value) => {
 	if (typeof collection !== 'string') throw 'DB.Update error: collection name must be a string'
 
 	var doc = await _db.collection(collection).findOneAndUpdate(filter, { $set: value }, { upsert: true })
@@ -85,5 +94,5 @@ const DeleteMany = async (collection, filter) => {
 	}
 }
 
-module.exports = {init, create, createMany, Delete, DeleteMany, read, readMany, Update }
+module.exports = {init, create, createMany, createOrUpdate, Delete, DeleteMany, read, readMany, update }
 
